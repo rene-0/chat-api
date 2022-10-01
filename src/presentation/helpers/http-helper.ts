@@ -42,3 +42,10 @@ export function forbidden (error: Error): HttpResponse<any> {
     body: error.message
   }
 }
+
+export function noContent (error: Error): HttpResponse<any> {
+  return {
+    statusCode: 204,
+    body: error.message
+  }
+}
