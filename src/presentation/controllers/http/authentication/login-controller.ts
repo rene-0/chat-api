@@ -1,7 +1,7 @@
-import { Authentication } from '../../../domain/usecases/authentication/user-authentication'
-import { ok, serverError, unauthorized } from '../../helpers/http-helper'
-import { Controller } from '../../protocols/controller'
-import { HttpResponse } from '../../protocols/http'
+import { Authentication } from '../../../../domain/usecases/authentication/user-authentication'
+import { ok, serverError, unauthorized } from '../../../helpers/http-helper'
+import { Controller } from '../../../protocols/controller'
+import { HttpResponse } from '../../../protocols/http'
 import jwt from 'jsonwebtoken'
 
 export class LoginController implements Controller {
