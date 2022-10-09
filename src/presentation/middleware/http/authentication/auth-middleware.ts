@@ -1,9 +1,9 @@
-import { forbidden, ok, serverError } from '../../helpers/http-helper'
-import { Controller } from '../../protocols/controller'
-import { HttpResponse } from '../../protocols/http'
+import { forbidden, ok, serverError } from '../../../helpers/http-helper'
+import { Controller } from '../../../protocols/controller'
+import { HttpResponse } from '../../../protocols/http'
 import jwt from 'jsonwebtoken'
-import { DoesAccountExists } from '../../../domain/usecases/authentication/does-account-exists'
-import { UserModel } from '../../../domain/models/user-model'
+import { DoesAccountExists } from '../../../../domain/usecases/authentication/does-account-exists'
+import { UserModel } from '../../../../domain/models/user-model'
 
 export class AuthController implements Controller {
   constructor (

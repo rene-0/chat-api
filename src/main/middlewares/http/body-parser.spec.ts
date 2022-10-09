@@ -1,4 +1,4 @@
-import app from '../config/app'
+import app from '../../config/app'
 import Request from 'supertest'
 
 describe('Body Parser Middleware', () => {
