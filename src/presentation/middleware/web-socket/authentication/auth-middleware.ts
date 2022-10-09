@@ -14,9 +14,7 @@ export class WebSocketAuthController implements Controller {
 
   async handle (socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>): Promise<HttpResponse<any>> {
     try {
-      // const { accessToken } = socket
-      // console.log('socket.handshake.auth', socket.handshake.auth)
-      const { token: accessToken } = socket.handshake.auth.accessToken // usar isso
+      const { token: accessToken } = socket.handshake.auth.accessToken
 
       if (!accessToken) {
         return forbidden(new Error('Access denied'))
