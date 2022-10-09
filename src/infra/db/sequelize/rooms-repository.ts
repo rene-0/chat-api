@@ -1,11 +1,19 @@
 import { QueryTypes } from 'sequelize'
 import { FindAllRoomsRepository } from '../../../data/protocols/rooms/find-all-rooms-repository'
+import { LoadAllRoomsIdsRepository } from '../../../data/protocols/rooms/load-all-rooms-ids-repository'
 import { SequelizeHelper } from '../../helper/sequelize-helper'
 
-export class RoomsRepository implements FindAllRoomsRepository {
+export class RoomsRepository implements FindAllRoomsRepository, LoadAllRoomsIdsRepository {
   constructor (
     private readonly sequelize = SequelizeHelper
   ) {}
+
+  async loadAllRoomsIds (): Promise<LoadAllRoomsIdsRepository.Response> {
+    const sql = 'SELECT id_room idRoom FROM rooms'
+
+    const roomsIds = await this.sequelize.client.query<LoadAllRoomsIdsRepository.Response[0]>(sql, { type: QueryTypes.SELECT })
+    return roomsIds
+  }
 
   async findAllRooms (request: FindAllRoomsRepository.Request): Promise<FindAllRoomsRepository.Response> {
     const { name } = request
