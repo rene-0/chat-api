@@ -9,7 +9,7 @@ export type SequelizeHelperType = {
 
 export const SequelizeHelper: SequelizeHelperType = {
   async connect (database = env.dbName, username = env.dbUser, password = env.dbPassword): Promise<void> {
-    this.client = new Sequelize(database, username, password, { dialect: 'mariadb' })
+    this.client = new Sequelize(database, username, password, { dialect: 'mariadb', logging: false, dialectOptions: { multipleStatements: true } })
   },
 
   async disconnect (): Promise<void> {
