@@ -1,9 +1,10 @@
 import { QueryTypes } from 'sequelize'
 import { LoadLastInsertedRoomMessageRepository } from '../../../data/protocols/room-message/load-last-inserted-message-repository'
+import { SearchAllRoomMessagesRepository } from '../../../data/protocols/room-message/search-all-room-messages-repository'
 import { WriteRoomMessageRepository } from '../../../data/protocols/room-message/write-room-message-repository'
 import { SequelizeHelper } from '../../helper/sequelize-helper'
 
-export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLastInsertedRoomMessageRepository {
+export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLastInsertedRoomMessageRepository, SearchAllRoomMessagesRepository {
   constructor (
     private readonly sequelize = SequelizeHelper
   ) {}
@@ -42,5 +43,25 @@ export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLa
     const [{ lastInsertedId }] = await this.sequelize.client.query<any>(last, { type: QueryTypes.SELECT })
 
     return lastInsertedId
+  }
+
+  async searchAllRoomMessages (request: SearchAllRoomMessagesRepository.Request): Promise<SearchAllRoomMessagesRepository.Response> {
+    const { idRoom, idUser } = request
+    const sql = `
+      SELECT id_room_messages idRoomMessage, name user, message, date_time time, deleted, edited, CASE WHEN rm.id_user = :idUser THEN 'S' ELSE 'N' END you
+      FROM room_messages rm
+      INNER JOIN users u ON (u.id_user = rm.id_user)
+      WHERE id_room = :idRoom
+      ORDER BY date_time ASC
+    `
+
+    const replacements = {
+      idRoom,
+      idUser
+    }
+
+    const roomMessages = await this.sequelize.client.query<any>(sql, { type: QueryTypes.SELECT, replacements })
+
+    return roomMessages
   }
 }
