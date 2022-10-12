@@ -28,15 +28,9 @@ export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLa
 
   async writeRoomMessage (request: WriteRoomMessageRepository.Request): Promise<WriteRoomMessageRepository.Response> {
     const { idRoom, idUser, message } = request
-    // const sql = `
-    //   INSERT INTO room_messages (id_room, id_user, message) VALUES (:idRoom, :idUser, :message);
-    //   SELECT LAST_INSERT_ID() lastInsertedId;
-    // `
-    const sql = `
-      INSERT INTO room_messages (id_room, id_user, message) VALUES (:idRoom, :idUser, :message);
-    `
+    const sql = 'INSERT INTO room_messages (id_room, id_user, message) VALUES (:idRoom, :idUser, :message)'
 
-    const last = 'SELECT LAST_INSERT_ID() lastInsertedId;'
+    const last = 'SELECT LAST_INSERT_ID() lastInsertedId'
 
     const replacements = {
       idRoom,
@@ -44,7 +38,7 @@ export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLa
       message
     }
 
-    await this.sequelize.client.query<any>(sql, { replacements, type: QueryTypes.INSERT })
+    await this.sequelize.client.query(sql, { replacements, type: QueryTypes.INSERT })
     const [{ lastInsertedId }] = await this.sequelize.client.query<any>(last, { type: QueryTypes.SELECT })
 
     return lastInsertedId
