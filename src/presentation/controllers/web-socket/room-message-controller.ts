@@ -5,6 +5,7 @@ import { ok, serverError } from '../../helpers/http-helper'
 import { EventController } from '../../protocols/avent-controller'
 import { HttpResponse } from '../../protocols/http'
 import jwt from 'jsonwebtoken'
+import { UserModel } from '../../../domain/models/user-model'
 
 export class RoomMessageController implements EventController {
   constructor (
@@ -17,27 +18,21 @@ export class RoomMessageController implements EventController {
     request?: RoomMessageController.Request
   ): Promise<HttpResponse<any>> {
     try {
-      console.log('request', request)
       const { message, chatRoom } = request
 
       const { accessToken: { token } } = socket.handshake.auth
 
-      const { idUser } = jwt.decode(token) as { idUser: number }
+      const { idUser, email } = jwt.decode(token) as Omit<UserModel, 'password' | 'lastConnected'>
 
       const lastInsertedRoomMessage = await this.dbWriteRoomMessage.writeRoomMessage({ idRoom: chatRoom, idUser, message })
-      console.log('lastInsertedRoomMessage', lastInsertedRoomMessage)
-      const senderRoomMessage: RoomMessageController.SenderRoomMessage = {
+
+      const receiverRoomMessage: RoomMessageController.RoomMessage = {
         ...lastInsertedRoomMessage,
         idMessage: lastInsertedRoomMessage.idRoomMessage,
-        you: true
+        sender: email
       }
-      socket.to(`chat/${chatRoom}`).emit('room/message', senderRoomMessage)
-      const receiverRoomMessage: RoomMessageController.ReceiverRoomMessage = {
-        ...lastInsertedRoomMessage,
-        idMessage: lastInsertedRoomMessage.idRoomMessage,
-        you: false
-      }
-      server.to(`chat/${chatRoom}`).emit('room/message', receiverRoomMessage)
+      // server.in PARA TODOS INCLUINDO QUEM ENVIOU
+      server.in(`chat/${chatRoom}`).emit('room/message', receiverRoomMessage)
       return ok({})
     } catch (error) {
       console.log('error', error)
@@ -52,12 +47,12 @@ export namespace RoomMessageController {
     message: string
   }
 
-  export type SenderRoomMessage = {
+  export type RoomMessage = {
     idMessage: number
     user: string
     time: string
     message: string
-    you: true
+    sender: string
   }
 
   export type ReceiverRoomMessage = {

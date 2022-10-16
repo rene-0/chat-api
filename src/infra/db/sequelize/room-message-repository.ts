@@ -48,7 +48,7 @@ export class RoomMessageRepository implements WriteRoomMessageRepository, LoadLa
   async searchAllRoomMessages (request: SearchAllRoomMessagesRepository.Request): Promise<SearchAllRoomMessagesRepository.Response> {
     const { idRoom, idUser } = request
     const sql = `
-      SELECT id_room_messages idRoomMessage, name user, message, date_time time, deleted, edited, CASE WHEN rm.id_user = :idUser THEN 'S' ELSE 'N' END you
+      SELECT id_room_messages idRoomMessage, name user, message, date_time time, deleted, edited, email sender
       FROM room_messages rm
       INNER JOIN users u ON (u.id_user = rm.id_user)
       WHERE id_room = :idRoom

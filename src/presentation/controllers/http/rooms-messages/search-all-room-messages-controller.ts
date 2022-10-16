@@ -16,13 +16,13 @@ export class SearchAllRoomMessagesController implements Controller {
 
       const { idUser } = jwt.decode(accessToken) as { idUser: number }
 
-      const allRooms = await this.dbSearchAllRoomMessages.searchAllRoomMessages({ idRoom, idUser })
+      const allRoomsMessages = await this.dbSearchAllRoomMessages.searchAllRoomMessages({ idRoom, idUser })
 
-      if (allRooms.length <= 0) {
+      if (allRoomsMessages.length <= 0) {
         return noContent(new Error('Nenhuma mensagem encontrada!'))
       }
 
-      return ok(allRooms)
+      return ok(allRoomsMessages)
     } catch (error) {
       return serverError(error)
     }

@@ -11,8 +11,7 @@ export class DbSearchAllRoomMessages implements SearchAllRoomMessages {
     const allRoomMessages = loadedAllRoomMessages.map(roomMessage => ({
       ...roomMessage,
       deleted: roomMessage.deleted === 'S',
-      edited: roomMessage.edited === 'S',
-      you: roomMessage.you === 'S'
+      edited: roomMessage.edited === 'S'
     }))
     return allRoomMessages
   }

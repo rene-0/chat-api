@@ -5,5 +5,5 @@ export type RoomMessageModel = {
   time: string
   deleted: boolean
   edited: boolean
-  you: boolean
+  sender: string
 }
