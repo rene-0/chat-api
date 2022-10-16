@@ -1,4 +1,4 @@
-import { SearchAllRoomMessagesController } from '../../../../../presentation/controllers/rooms-messages/search-all-room-messages-controller'
+import { SearchAllRoomMessagesController } from '../../../../../presentation/controllers/http/rooms-messages/search-all-room-messages-controller'
 import { makeDbSearchAllRoomMessages } from '../../../usecases/room-message/db-search-all-room-messages-factory'
 
 export const makeSearchAllRoomMessagesController = (): SearchAllRoomMessagesController => {

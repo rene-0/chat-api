@@ -1,8 +1,8 @@
-import { RoomMessageModel } from '../../../domain/models/room-message-model'
-import { SearchAllRoomMessages } from '../../../domain/usecases/room-message/db-search-all-room-messages'
-import { noContent, ok, serverError } from '../../helpers/http-helper'
-import { Controller } from '../../protocols/controller'
-import { HttpResponse } from '../../protocols/http'
+import { RoomMessageModel } from '../../../../domain/models/room-message-model'
+import { SearchAllRoomMessages } from '../../../../domain/usecases/room-message/db-search-all-room-messages'
+import { noContent, ok, serverError } from '../../../helpers/http-helper'
+import { Controller } from '../../../protocols/controller'
+import { HttpResponse } from '../../../protocols/http'
 import jwt from 'jsonwebtoken'
 
 export class SearchAllRoomMessagesController implements Controller {
