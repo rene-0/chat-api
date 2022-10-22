@@ -18,9 +18,9 @@ export class RoomsRepository implements FindAllRoomsRepository, LoadAllRoomsIdsR
   async findAllRooms (request: FindAllRoomsRepository.Request): Promise<FindAllRoomsRepository.Response> {
     const { name } = request
 
-    let having = ''
+    let where = ''
     if (name) {
-      having += ' HAVING name LIKE :name'
+      where += ' WHERE name LIKE :name'
     }
 
     const replacements = {
@@ -28,12 +28,12 @@ export class RoomsRepository implements FindAllRoomsRepository, LoadAllRoomsIdsR
     }
 
     const sql = `
-      SELECT DISTINCT r.id_room idRoom, name, max(date_time) lastMessageTime, message lastMessage
+      SELECT r.id_room idRoom,
+      name,
+      (SELECT max(date_time) FROM room_messages WHERE id_room = idRoom) lastMessageTime,
+      (SELECT message FROM room_messages WHERE id_room = idRoom ORDER BY date_time desc LIMIT 1) lastMessage
       FROM rooms r
-      INNER JOIN room_messages rm ON (r.id_room = rm.id_room)
-      GROUP BY r.id_room
-      ${having}
-      ORDER BY date_time desc    
+      ${where}
     `
 
     const allRooms = await this.sequelize.client.query<FindAllRoomsRepository.Response[0]>(sql, { type: QueryTypes.SELECT, replacements })
