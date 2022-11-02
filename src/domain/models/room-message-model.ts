@@ -5,5 +5,14 @@ export type RoomMessageModel = {
   time: string
   deleted: boolean
   edited: boolean
-  sender: string
+}
+
+export type DbRoomMessageModel = {
+  idRoomMessage: number
+  idRoom: number
+  idUser: number
+  message: string
+  dateTime: string
+  deleted: 'N' | 'Y'
+  edited: 'N' | 'Y'
 }

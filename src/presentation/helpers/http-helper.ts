@@ -1,16 +1,13 @@
+import { ValidationErrorModel } from '../../domain/models/validation-error-model'
 import { HttpResponse } from '../protocols/http'
 
-type BadRequestProps = {
-  errors: string[]
-  response?: string
-}
+type BadRequestProps<T> = Omit<ValidationErrorModel<T>, 'isValid'>
 
-export function badRequest ({ errors, response }: BadRequestProps): HttpResponse<any> {
+export function badRequest<T> (response: BadRequestProps<T>): HttpResponse<any> {
   return {
     statusCode: 400,
     body: {
-      response,
-      errors
+      response
     }
   }
 }

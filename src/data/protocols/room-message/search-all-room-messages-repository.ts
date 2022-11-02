@@ -10,10 +10,9 @@ export namespace SearchAllRoomMessagesRepository {
     idUser: number
   }
 
-  type RoomMessage = Omit<RoomMessageModel, 'deleted' | 'edited' | 'you'> & {
-    you: 'S' | 'N'
-    deleted: 'S' | 'N'
-    edited: 'S' | 'N'
+  type RoomMessage = Omit<RoomMessageModel, 'deleted' | 'edited'> & {
+    deleted: 'Y' | 'N'
+    edited: 'Y' | 'N'
   }
 
   export type Response = RoomMessage[]
