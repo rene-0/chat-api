@@ -1,4 +1,3 @@
-import { UserModel } from '../../../../domain/models/user-model'
 import { DoesAccountExists } from '../../../../domain/usecases/authentication/does-account-exists'
 import { ok, serverError, forbidden } from '../../../helpers/http-helper'
 import { Controller } from '../../../protocols/controller'
@@ -6,6 +5,7 @@ import { HttpResponse } from '../../../protocols/http'
 import jwt from 'jsonwebtoken'
 import { Socket } from 'socket.io'
 import { DefaultEventsMap } from 'socket.io/dist/typed-events'
+import { AccessTokenPayloadModel } from '../../../../domain/models/access-token-payload-model'
 
 export class WebSocketAuthController implements Controller {
   constructor (
@@ -21,8 +21,8 @@ export class WebSocketAuthController implements Controller {
       }
 
       let isTokenValid = true
-      let decodedToken: Omit<UserModel, 'password' | 'lastConnected'>
-      jwt.verify(accessToken, 'secret', (error, decoded: Omit<UserModel, 'password' | 'lastConnected'>): void => {
+      let decodedToken: AccessTokenPayloadModel
+      jwt.verify(accessToken, 'secret', (error, decoded: AccessTokenPayloadModel): void => {
         if (error) {
           isTokenValid = false
         }

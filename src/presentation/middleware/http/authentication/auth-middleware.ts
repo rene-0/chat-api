@@ -3,7 +3,7 @@ import { Controller } from '../../../protocols/controller'
 import { HttpResponse } from '../../../protocols/http'
 import jwt from 'jsonwebtoken'
 import { DoesAccountExists } from '../../../../domain/usecases/authentication/does-account-exists'
-import { UserModel } from '../../../../domain/models/user-model'
+import { AccessTokenPayloadModel } from '../../../../domain/models/access-token-payload-model'
 
 export class AuthController implements Controller {
   constructor (
@@ -19,8 +19,8 @@ export class AuthController implements Controller {
       }
 
       let isTokenValid = true
-      let decodedToken: Omit<UserModel, 'password' | 'lastConnected'>
-      jwt.verify(accessToken, 'secret', (error, decoded: Omit<UserModel, 'password' | 'lastConnected'>): void => {
+      let decodedToken: AccessTokenPayloadModel
+      jwt.verify(accessToken, 'secret', (error, decoded: AccessTokenPayloadModel): void => {
         if (error) {
           isTokenValid = false
         }
