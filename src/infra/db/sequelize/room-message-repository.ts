@@ -1,4 +1,5 @@
 import { QueryTypes } from 'sequelize'
+import { DeleteRoomMessageRepository } from '../../../data/protocols/room-message/delete-room-message-repository'
 import { LoadLastInsertedRoomMessageRepository } from '../../../data/protocols/room-message/load-last-inserted-message-repository'
 import { LoadRoomMessageModelRepository } from '../../../data/protocols/room-message/load-room-message-repository'
 import { SearchAllRoomMessagesRepository } from '../../../data/protocols/room-message/search-all-room-messages-repository'
@@ -12,14 +13,27 @@ export class RoomMessageRepository implements
   LoadLastInsertedRoomMessageRepository,
   SearchAllRoomMessagesRepository,
   UpdateRoomMessageRepository,
-  LoadRoomMessageModelRepository {
+  LoadRoomMessageModelRepository,
+  DeleteRoomMessageRepository {
   constructor (
     private readonly sequelize = SequelizeHelper
   ) {}
 
+  async deleteRoomMessage (request: DeleteRoomMessageRepository.Request): Promise<boolean> {
+    const { idRoomMessage } = request
+    const sql = "UPDATE room_messages SET deleted = 'Y' WHERE id_room_message = :idRoomMessage"
+
+    const replacements = {
+      idRoomMessage
+    }
+
+    const updateResult = await this.sequelize.client.query(sql, { replacements, type: QueryTypes.UPDATE })
+
+    return updateResult[1] > 0
+  }
+
   async loadRoomMessageModel (request: LoadRoomMessageModelRepository.Request): Promise<DbRoomMessageModel> {
     const { idMessage } = request
-    console.log('idMessage', idMessage)
     const sql = 'SELECT * FROM room_messages WHERE id_room_message = :idMessage LIMIT 1'
 
     const replacements = {
@@ -84,7 +98,17 @@ export class RoomMessageRepository implements
   async searchAllRoomMessages (request: SearchAllRoomMessagesRepository.Request): Promise<SearchAllRoomMessagesRepository.Response> {
     const { idRoom, idUser } = request
     const sql = `
-      SELECT id_room_message idRoomMessage, name user, message, date_time time, deleted, edited, email sender
+      SELECT
+        id_room_message idRoomMessage,
+          name user,
+          CASE
+          WHEN deleted = 'Y' THEN 'Mensagem deletada'
+              ELSE message
+        END message,
+          date_time time,
+          deleted,
+          edited,
+        email sender
       FROM room_messages rm
       INNER JOIN users u ON (u.id_user = rm.id_user)
       WHERE id_room = :idRoom
