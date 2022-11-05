@@ -36,7 +36,6 @@ export class UpdateRoomController implements EventController {
       server.in(`chat/${idRoom}`).emit('room/updateMessage', { idMessage, message })
       return ok({})
     } catch (error) {
-      console.log('error', error)
       return serverError(error)
     }
   }
