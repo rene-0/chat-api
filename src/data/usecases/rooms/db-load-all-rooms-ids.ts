@@ -1,14 +1,15 @@
-import { LoadAllRoomsIds } from '../../../domain/usecases/rooms/db-load-all-rooms-ids'
-import { LoadAllRoomsIdsRepository } from '../../protocols/rooms/load-all-rooms-ids-repository'
+import { LoadAllJoinedRoomsIds } from '../../../domain/usecases/rooms/load-all-joined-rooms-ids'
+import { LoadAllJoinedRoomsIdsRepository } from '../../protocols/rooms/load-all-joined-rooms-ids-repository'
 
-export class DbLoadAllRoomsIds implements LoadAllRoomsIds {
+export class DbLoadAllRoomsIds implements LoadAllJoinedRoomsIds {
   constructor (
-    private readonly roomsRepository: LoadAllRoomsIdsRepository
+    private readonly roomsRepository: LoadAllJoinedRoomsIdsRepository
   ) {}
 
-  async loadAllRoomsIds (): Promise<LoadAllRoomsIds.Response> {
-    const roomsIds = await this.roomsRepository.loadAllRoomsIds()
-    const ids = roomsIds.map(({ idRoom }) => idRoom)
+  async loadAllJoinedRoomsIds (request: LoadAllJoinedRoomsIds.Request): Promise<LoadAllJoinedRoomsIds.Response> {
+    const { userId } = request
+    const roomsIds = await this.roomsRepository.loadAllJoinedRoomsIds({ userId })
+    const ids = roomsIds.map(({ roomId }) => roomId)
     return ids
   }
 }

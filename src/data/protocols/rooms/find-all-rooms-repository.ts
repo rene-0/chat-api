@@ -6,6 +6,7 @@ export interface FindAllRoomsRepository {
 
 export namespace FindAllRoomsRepository {
   export type Request = {
+    userId: number
     name?: string
   }
 

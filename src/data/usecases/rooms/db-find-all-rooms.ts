@@ -1,4 +1,4 @@
-import { FindAllRooms } from '../../../domain/usecases/rooms/db-find-all-rooms'
+import { FindAllRooms } from '../../../domain/usecases/rooms/find-all-rooms'
 import { FindAllRoomsRepository } from '../../protocols/rooms/find-all-rooms-repository'
 
 export class DbFindAllRooms implements FindAllRooms {
