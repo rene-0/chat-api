@@ -10,8 +10,7 @@
   * Execute exemple.sql
   * Na raiz da api, execute:  ``` npm i ```
 
-## Testes
-  Para executar os testes: ``` npm run test ``` ou ``` npm run test:ci ```
-
 ## Uso
   Executando a aplicação em modo de desenvolvimento: ``` npm run dev ```
+
+> API para o [chat-app](https://github.com/rene-0/chat-app)
