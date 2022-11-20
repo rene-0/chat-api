@@ -31,6 +31,10 @@ export class CreateRoomController implements EventController {
       const createdRoom = await this.dbCreateRoom.createRoom({ idUser, roomName }, transaction)
 
       server.in(`user/${idUser}`).emit('room/new', createdRoom)
+      const sockets = await server.in(`user/${idUser}`).fetchSockets()
+      sockets.forEach((socket) => {
+        socket.join(`chat/${createdRoom.idRoom}`)
+      })
       return ok({})
     } catch (error) {
       return serverError(error)
