@@ -1,7 +1,9 @@
 import { QueryTypes, Transaction } from 'sequelize'
 import { AddUserAdminToRoomRepository } from '../../../data/protocols/rooms/add-user-admin-to-room-repository'
+import { AddUserToRoomRepository } from '../../../data/protocols/rooms/add-user-to-room-repository'
 import { CreateRoomRepository } from '../../../data/protocols/rooms/create-room-repository'
 import { FindAllRoomsRepository } from '../../../data/protocols/rooms/find-all-rooms-repository'
+import { FindOneRoomRepository } from '../../../data/protocols/rooms/find-one-room-repository'
 import { LoadAllJoinedRoomsIdsRepository } from '../../../data/protocols/rooms/load-all-joined-rooms-ids-repository'
 import { FindRoomRepository } from '../../../domain/usecases/rooms/db-find-room'
 import { SequelizeHelper } from '../../helper/sequelize-helper'
@@ -11,10 +13,46 @@ export class RoomsRepository implements
   LoadAllJoinedRoomsIdsRepository,
   CreateRoomRepository,
   AddUserAdminToRoomRepository,
-  FindRoomRepository {
+  FindRoomRepository,
+  AddUserToRoomRepository,
+  FindOneRoomRepository {
   constructor (
     private readonly sequelize = SequelizeHelper
   ) {}
+
+  async findOneRoom (request: FindOneRoomRepository.Request): Promise<FindOneRoomRepository.Response> {
+    const { roomId } = request
+
+    const sql = `
+      SELECT r.id_room idRoom,
+      name,
+      (SELECT max(date_time) FROM room_messages WHERE id_room = idRoom) lastMessageTime,
+      (SELECT message FROM room_messages WHERE id_room = idRoom ORDER BY date_time desc LIMIT 1) lastMessage
+      FROM rooms r
+      WHERE r.id_room = :roomId
+    `
+
+    const replacements = {
+      roomId
+    }
+
+    const [room] = await this.sequelize.client.query<FindRoomRepository.Response>(sql, { replacements, type: QueryTypes.SELECT })
+    return room
+  }
+
+  async addUserToRoom (request: AddUserToRoomRepository.Request): Promise<AddUserToRoomRepository.Response> {
+    const { roomToAddUser, userToBeAdded } = request
+    const sql = 'INSERT INTO room_users (id_user, id_room) VALUES (:userToBeAdded, :roomToAddUser)'
+
+    const replacements = {
+      roomToAddUser,
+      userToBeAdded
+    }
+
+    const [insertedRoomUsersId] = await this.sequelize.client.query(sql, { replacements, type: QueryTypes.INSERT })
+
+    return insertedRoomUsersId > 0
+  }
 
   async findRoom (request: FindRoomRepository.Request, transaction: Transaction): Promise<FindRoomRepository.Response> {
     const { idRoom } = request
