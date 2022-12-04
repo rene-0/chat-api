@@ -9,13 +9,13 @@ export class DbAddUserToRoom implements AddUserToRoom {
   ) {}
 
   async addUserToRoom (request: AddUserToRoom.Request): Promise<AddUserToRoom.Response> {
-    const { roomToAddUser, userToBeAdded } = request
-    const acknowledge = await this.addUserToRoomRepository.addUserToRoom({ roomToAddUser, userToBeAdded })
-    console.log('acknowledge', acknowledge)
+    const { roomToAddUser, usersToBeAdded } = request
+    const acknowledge = await this.addUserToRoomRepository.addUserToRoom({ roomToAddUser, usersToBeAdded })
+
     if (!acknowledge) {
       return
     }
-    console.log('roomToAddUser', roomToAddUser)
+
     const room = await this.findOneRoomRepository.findOneRoom({ roomId: roomToAddUser })
     return room
   }

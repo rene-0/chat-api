@@ -7,32 +7,31 @@ import { DefaultEventsMap } from 'socket.io/dist/typed-events'
 import { EventController } from '../../protocols/avent-controller'
 
 export class AddUserToRoomController implements EventController {
-  constructor (
-    private readonly dbAddUserToRoomController: AddUserToRoom
-  ) {}
+  constructor(private readonly dbAddUserToRoomController: AddUserToRoom) {}
 
-  async handle (
+  async handle(
     server: Server<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
     socket: Socket<DefaultEventsMap, DefaultEventsMap, DefaultEventsMap, any>,
     request: FindAllRoomsController.Request
   ): Promise<HttpResponse<any>> {
     try {
-      const { userToBeAdded, roomToAddUser } = request
+      const { usersToBeAdded, roomToAddUser } = request
 
       // Validar
       // const { idUser } = jwt.decode(accessToken) as AccessTokenPayloadModel
 
-      const room = await this.dbAddUserToRoomController.addUserToRoom({ roomToAddUser, userToBeAdded })
+      const room = await this.dbAddUserToRoomController.addUserToRoom({ roomToAddUser, usersToBeAdded })
 
-      server.in(`user/${userToBeAdded}`).emit('room/new', room)
-      const sockets = await server.in(`user/${userToBeAdded}`).fetchSockets()
-      sockets.forEach((socket) => {
-        socket.join(`chat/${roomToAddUser}`)
+      usersToBeAdded.forEach(async (user) => {
+        server.in(`user/${user}`).emit('room/new', room)
+        const sockets = await server.in(`user/${user}`).fetchSockets()
+        sockets.forEach((socket) => {
+          socket.join(`chat/${roomToAddUser}`)
+        })
       })
 
       return ok({})
     } catch (error) {
-      console.log('error', error)
       return serverError(error)
     }
   }
@@ -40,7 +39,7 @@ export class AddUserToRoomController implements EventController {
 
 export namespace FindAllRoomsController {
   export type Request = {
-    userToBeAdded: number
+    usersToBeAdded: number[]
     roomToAddUser: number
     accessToken: string
   }

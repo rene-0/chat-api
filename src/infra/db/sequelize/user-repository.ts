@@ -1,4 +1,4 @@
-import QueryTypes from 'sequelize/types/query-types'
+import { QueryTypes } from 'sequelize'
 import { FindUsersToAddToRoomRepository } from '../../../data/protocols/users/find-users-to-add-to-room-repository'
 import { SequelizeHelper } from '../../helper/sequelize-helper'
 

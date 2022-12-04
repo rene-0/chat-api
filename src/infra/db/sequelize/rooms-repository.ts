@@ -8,19 +8,19 @@ import { LoadAllJoinedRoomsIdsRepository } from '../../../data/protocols/rooms/l
 import { FindRoomRepository } from '../../../domain/usecases/rooms/db-find-room'
 import { SequelizeHelper } from '../../helper/sequelize-helper'
 
-export class RoomsRepository implements
-  FindAllRoomsRepository,
-  LoadAllJoinedRoomsIdsRepository,
-  CreateRoomRepository,
-  AddUserAdminToRoomRepository,
-  FindRoomRepository,
-  AddUserToRoomRepository,
-  FindOneRoomRepository {
-  constructor (
-    private readonly sequelize = SequelizeHelper
-  ) {}
+export class RoomsRepository
+  implements
+    FindAllRoomsRepository,
+    LoadAllJoinedRoomsIdsRepository,
+    CreateRoomRepository,
+    AddUserAdminToRoomRepository,
+    FindRoomRepository,
+    AddUserToRoomRepository,
+    FindOneRoomRepository
+{
+  constructor(private readonly sequelize = SequelizeHelper) {}
 
-  async findOneRoom (request: FindOneRoomRepository.Request): Promise<FindOneRoomRepository.Response> {
+  async findOneRoom(request: FindOneRoomRepository.Request): Promise<FindOneRoomRepository.Response> {
     const { roomId } = request
 
     const sql = `
@@ -33,28 +33,39 @@ export class RoomsRepository implements
     `
 
     const replacements = {
-      roomId
+      roomId,
     }
 
-    const [room] = await this.sequelize.client.query<FindRoomRepository.Response>(sql, { replacements, type: QueryTypes.SELECT })
+    const [room] = await this.sequelize.client.query<FindRoomRepository.Response>(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+    })
     return room
   }
 
-  async addUserToRoom (request: AddUserToRoomRepository.Request): Promise<AddUserToRoomRepository.Response> {
-    const { roomToAddUser, userToBeAdded } = request
-    const sql = 'INSERT INTO room_users (id_user, id_room) VALUES (:userToBeAdded, :roomToAddUser)'
+  async addUserToRoom(request: AddUserToRoomRepository.Request): Promise<AddUserToRoomRepository.Response> {
+    const { roomToAddUser, usersToBeAdded } = request
+    const sql = `
+      INSERT INTO room_users (id_user, id_room)
+      SELECT id_user, :roomToAddUser
+      FROM users
+      WHERE id_user IN (:usersToBeAdded)
+    `
 
     const replacements = {
       roomToAddUser,
-      userToBeAdded
+      usersToBeAdded,
     }
 
-    const [insertedRoomUsersId] = await this.sequelize.client.query(sql, { replacements, type: QueryTypes.INSERT })
+    const [insertedRoomUsersId] = await this.sequelize.client.query(sql, {
+      replacements,
+      type: QueryTypes.INSERT,
+    })
 
     return insertedRoomUsersId > 0
   }
 
-  async findRoom (request: FindRoomRepository.Request, transaction: Transaction): Promise<FindRoomRepository.Response> {
+  async findRoom(request: FindRoomRepository.Request, transaction: Transaction): Promise<FindRoomRepository.Response> {
     const { idRoom } = request
 
     const sql = `
@@ -67,53 +78,65 @@ export class RoomsRepository implements
     `
 
     const replacements = {
-      idRoom
+      idRoom,
     }
 
-    const [room] = await this.sequelize.client.query<FindRoomRepository.Response>(sql, { replacements, type: QueryTypes.SELECT, transaction })
+    const [room] = await this.sequelize.client.query<FindRoomRepository.Response>(sql, {
+      replacements,
+      type: QueryTypes.SELECT,
+      transaction,
+    })
 
     return room
   }
 
-  async addUserAdminToRoom (request: AddUserAdminToRoomRepository.Request, transaction: Transaction): Promise<boolean> {
+  async addUserAdminToRoom(request: AddUserAdminToRoomRepository.Request, transaction: Transaction): Promise<boolean> {
     const { idRoom, idUser } = request
     const sql = "INSERT INTO room_users (id_user, id_room, admin) VALUES (:idUser, :idRoom, 'Y')"
 
     const replacements = {
       idRoom,
-      idUser
+      idUser,
     }
 
-    const insertedUserInRoomId = await this.sequelize.client.query(sql, { replacements, type: QueryTypes.INSERT, transaction })
+    const insertedUserInRoomId = await this.sequelize.client.query(sql, {
+      replacements,
+      type: QueryTypes.INSERT,
+      transaction,
+    })
 
     return insertedUserInRoomId[0] > 0
   }
 
-  async createRoom (request: CreateRoomRepository.Request, transaction: Transaction): Promise<CreateRoomRepository.Response> {
+  async createRoom(request: CreateRoomRepository.Request, transaction: Transaction): Promise<CreateRoomRepository.Response> {
     const { roomName } = request
     const sql = 'INSERT INTO rooms (name) VALUES (:roomName)'
 
     const replacements = {
-      roomName
+      roomName,
     }
 
-    const [createdRoomId] = await this.sequelize.client.query(sql, { replacements, type: QueryTypes.INSERT, transaction })
+    const [createdRoomId] = await this.sequelize.client.query(sql, {
+      replacements,
+      type: QueryTypes.INSERT,
+      transaction,
+    })
     return createdRoomId
   }
 
-  async loadAllJoinedRoomsIds (request: LoadAllJoinedRoomsIdsRepository.Request): Promise<LoadAllJoinedRoomsIdsRepository.Response> {
+  async loadAllJoinedRoomsIds(request: LoadAllJoinedRoomsIdsRepository.Request): Promise<LoadAllJoinedRoomsIdsRepository.Response> {
     const { userId } = request
     const sql = 'SELECT id_room roomId FROM room_users WHERE id_user = :userId'
 
     const replacements = {
-      userId
+      userId,
     }
 
     const roomsIds = await this.sequelize.client.query<LoadAllJoinedRoomsIdsRepository.Response[0]>(sql, { type: QueryTypes.SELECT, replacements })
     return roomsIds
   }
 
-  async findAllRooms (request: FindAllRoomsRepository.Request): Promise<FindAllRoomsRepository.Response> {
+  async findAllRooms(request: FindAllRoomsRepository.Request): Promise<FindAllRoomsRepository.Response> {
     const { name, userId } = request
 
     let where = 'WHERE id_user = :userId'
@@ -123,7 +146,7 @@ export class RoomsRepository implements
 
     const replacements = {
       ...(name ? { name: `%${name}%` } : {}),
-      userId
+      userId,
     }
 
     const sql = `

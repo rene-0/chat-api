@@ -4,7 +4,7 @@ export interface AddUserToRoomRepository {
 
 export namespace AddUserToRoomRepository {
   export type Request = {
-    userToBeAdded: number
+    usersToBeAdded: number[]
     roomToAddUser: number
   }
 
