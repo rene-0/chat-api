@@ -93,7 +93,7 @@ INSERT INTO users (name, email, password, last_connected)
 VALUES ('Default user', 'default_user@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP);
 
 INSERT INTO users (name, email, password, last_connected)
-VALUES ('Default user', 'default_user2@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP);
+VALUES ('Default user 2', 'default_user2@hotmail.com', 'a665a45920422f9d417e4867efdc4fb8a04a1f3fff1fa07e998e86f7f7a27ae3', CURRENT_TIMESTAMP);
 
 -- Exportação de dados foi desmarcado.
 
